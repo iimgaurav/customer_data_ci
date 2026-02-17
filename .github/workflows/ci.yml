@@ -32,7 +32,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          python test_clean_data.py
+          pytest
 
       - name: Display test results
         run: |
