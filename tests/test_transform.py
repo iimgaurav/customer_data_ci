@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import unittest
-from io import StringIO
 
 def clean_dataframe(df):
     """
@@ -265,9 +264,9 @@ class TestCleanDataFrame(unittest.TestCase):
 
 if __name__ == '__main__':
     # Run all tests
-    print("="*70)
+    print("=" * 70)
     print("RUNNING TESTS FOR clean_dataframe()")
-    print("="*70)
+    print("=" * 70)
     print()
     
     unittest.main(verbosity=2)

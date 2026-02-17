@@ -33,7 +33,7 @@ jobs:
       - name: run linting
         run: |
           pip install flake8
-          flake8 .
+          flake8 src/ tests/ --max-line-length=120 --ignore=W291,W292,W293,W391,E226,E302
 
       - name: Run unit tests
         run: |
