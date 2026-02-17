@@ -1,6 +1,5 @@
 import pandas as pd
-import numpy as np
-import os
+
 
 def clean_dataframe(df):
     """
@@ -76,9 +75,9 @@ print(f"• Removed {(messy_df['email'] == '').sum()} rows with empty emails")
 original_emails_cleaned = messy_df['email'].str.strip().str.lower()
 duplicates_count = original_emails_cleaned.duplicated().sum()
 print(f"• Removed {duplicates_count} duplicate emails")
-print(f"• All names and emails trimmed and lowercased")
+print("• All names and emails trimmed and lowercased")
 
 # Save cleaned data to new Excel file
 cleaned_df.to_excel(output_file, index=False, sheet_name='Cleaned Data')
-print(f"\n✓ Cleaned data saved to:")
+print("\n✓ Cleaned data saved to:")
 print(f"  {output_file}")
