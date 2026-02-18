@@ -1,54 +1,67 @@
-name: Customer Data Cleaning CI
+name: Customer Data CD
 
 on:
   push:
-    branches: [main, master, develop]
-  pull_request:
-    branches: [main, master, develop]
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
-  test:
-    name: Run Tests
+  build_and_test:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        python-version: ["3.11", "3.12", "3.13"]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
-      - name: run linting
-        run: |
-          pip install flake8
-          flake8 src/ tests/ --max-line-length=120 --ignore=W291,W292,W293,W391,E226,E302
-      - name: Run Tests with Coverage
-        run: |
-          pip install pytest-cov
-          pytest --cov=src --cov=tests --cov-report=term
-      - name: Run unit tests
-        run: |
-          pytest -v
-      - name: cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
 
-      - name: Display test results
-        run: |
-          echo "✓ All tests passed successfully!"
+      - name: Lint
+        run: flake8 src/ tests/ --max-line-length=120 --ignore=W291,W292,W293,W391,E226,E302
+
+      - name: Run Tests with Coverage
+        run: pytest --cov=src -v
+
+      - name: Create Build Artifact
+        run: zip -r build.zip src/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: build.zip
+
+  deploy_dev:
+    runs-on: ubuntu-latest
+    needs: build_and_test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+
+      - name: Simulate Dev Deployment
+        run: echo "Deploying build to DEV environment..."
+
+  deploy_prod:
+    runs-on: ubuntu-latest
+    needs: deploy_dev
+    environment: production
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+
+      - name: Simulate Prod Deployment
+        run: echo "Deploying build to PROD environment..."
